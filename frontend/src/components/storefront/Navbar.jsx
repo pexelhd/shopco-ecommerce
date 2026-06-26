@@ -92,14 +92,18 @@ export default function Navbar() {
     <>
       <nav className="bg-navy text-white sticky top-0 z-40 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between h-16">
-          <Link to="/" className="flex items-center gap-2 font-bold text-xl text-gold">
-            <Store size={24} />
-            ShopCo
-          </Link>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center gap-2 font-bold text-xl text-gold">
+              <Store size={24} />
+              ShopCo
+            </Link>
+            <div className="hidden md:flex items-center gap-6 text-sm font-medium">
+              <Link to="/" className="hover:text-gold transition-colors">Home</Link>
+              <Link to="/products" className="hover:text-gold transition-colors">Products</Link>
+            </div>
+          </div>
 
-          <div className="hidden md:flex items-center gap-6 text-sm font-medium">
-            <Link to="/" className="hover:text-gold transition-colors">Home</Link>
-            <Link to="/products" className="hover:text-gold transition-colors">Products</Link>
+          <div className="hidden md:flex items-center gap-4 text-sm font-medium">
             {!user && (
               <>
                 <Link to="/login" className="hover:text-gold transition-colors">Login</Link>
