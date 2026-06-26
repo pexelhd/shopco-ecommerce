@@ -11,6 +11,7 @@ import CheckoutPage from '@/pages/storefront/CheckoutPage';
 import OrderConfirmationPage from '@/pages/storefront/OrderConfirmationPage';
 import LoginPage from '@/pages/storefront/LoginPage';
 import RegisterPage from '@/pages/storefront/RegisterPage';
+import ProfilePage from '@/pages/storefront/ProfilePage';
 
 // Admin pages
 import AdminLoginPage from '@/pages/admin/AdminLoginPage';
@@ -39,6 +40,8 @@ export default function App() {
       {/* Storefront - public */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/profile" element={<CustomerRoute><ProfilePage /></CustomerRoute>} />
+      <Route path="/settings" element={<CustomerRoute><ProfilePage /></CustomerRoute>} />
 
       {/* Storefront - protected */}
       <Route path="/" element={<CustomerRoute><HomePage /></CustomerRoute>} />

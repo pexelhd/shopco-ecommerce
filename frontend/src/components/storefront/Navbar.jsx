@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, Store, Menu, X, User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import { ShoppingCart, Store, Menu, X, User, LogOut, Settings, ChevronDown, Sun, Moon } from 'lucide-react';
 import { useCart } from '@/hooks/useCart';
 import { useUserAuth } from '@/context/UserAuthContext';
+import { useDarkMode } from '@/context/DarkModeContext';
 import CartDrawer from './CartDrawer';
 
 function UserDropdown({ user, logout }) {
@@ -84,6 +85,7 @@ function UserDropdown({ user, logout }) {
 export default function Navbar() {
   const { totalItems } = useCart();
   const { user, logout } = useUserAuth();
+  const { dark, toggle } = useDarkMode();
   const [cartOpen, setCartOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
@@ -113,6 +115,13 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={toggle}
+              className="p-2 hover:bg-navy-light rounded-lg transition-colors cursor-pointer"
+              title={dark ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {dark ? <Sun size={20} className="text-gold" /> : <Moon size={20} className="text-slate-300" />}
+            </button>
             <button
               onClick={() => setCartOpen(true)}
               className="relative p-2 hover:bg-navy-light rounded-lg transition-colors cursor-pointer"
