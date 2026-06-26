@@ -1,0 +1,25 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #0D1B2A;
+  --color-navy-light: #1B2B3A;
+  --color-navy-lighter: #243447;
+  --color-gold: #F59E0B;
+  --color-gold-hover: #D97706;
+  --color-gold-light: #FEF3C7;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #F8FAFC;
+  color: #1E293B;
+}
+
+#root {
+  min-height: 100vh;
+}

@@ -1,0 +1,131 @@
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { toast } from 'sonner';
+import { Store, ShoppingBag, Tag, Truck, Star } from 'lucide-react';
+import Input from '@/components/ui/Input';
+import Button from '@/components/ui/Button';
+import { useUserAuth } from '@/context/UserAuthContext';
+
+const schema = z.object({
+  email: z.string().email('Invalid email'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+export default function LoginPage() {
+  const { login, user } = useUserAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
+
+  if (user) { navigate(from, { replace: true }); return null; }
+
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async ({ email, password }) => {
+    try {
+      await login(email, password);
+      toast.success('Welcome back!');
+      navigate(from, { replace: true });
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Login failed');
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left panel - branded */}
+      <div className="hidden lg:flex lg:w-1/2 bg-navy flex-col justify-between p-12 relative overflow-hidden">
+        {/* Background floating icons */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute top-10 left-8 opacity-5 text-white"><ShoppingBag size={120} /></div>
+          <div className="absolute top-40 right-12 opacity-5 text-white"><Tag size={90} /></div>
+          <div className="absolute bottom-32 left-16 opacity-5 text-white"><Truck size={100} /></div>
+          <div className="absolute bottom-10 right-8 opacity-5 text-white"><Star size={80} /></div>
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-5 text-white"><Store size={200} /></div>
+          {/* Decorative circles */}
+          <div className="absolute -top-20 -left-20 w-64 h-64 rounded-full bg-gold opacity-10" />
+          <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-gold opacity-10" />
+        </div>
+
+        {/* Logo */}
+        <div className="relative z-10 flex items-center gap-3 text-white">
+          <div className="bg-gold p-2 rounded-xl">
+            <Store size={28} className="text-white" />
+          </div>
+          <span className="text-2xl font-bold text-gold">ShopCo</span>
+        </div>
+
+        {/* Center content */}
+        <div className="relative z-10 space-y-8">
+          <div>
+            <h2 className="text-4xl font-bold text-white leading-tight">
+              Shop the Best.<br />
+              <span className="text-gold">Save More.</span>
+            </h2>
+            <p className="text-slate-400 mt-4 text-lg">
+              Thousands of quality products across electronics, clothing, home goods, and more.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            {[
+              { icon: ShoppingBag, text: 'Thousands of products across all categories' },
+              { icon: Truck, text: 'Free shipping on orders over $50' },
+              { icon: Tag, text: 'Exclusive deals and new arrivals every week' },
+              { icon: Star, text: 'Top-rated products from trusted brands' },
+            ].map(({ icon: Icon, text }) => (
+              <div key={text} className="flex items-center gap-3 text-slate-300">
+                <div className="bg-gold/20 p-2 rounded-lg flex-shrink-0">
+                  <Icon size={16} className="text-gold" />
+                </div>
+                <span className="text-sm">{text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Bottom tagline */}
+        <p className="relative z-10 text-slate-500 text-sm">
+          © 2026 ShopCo. All rights reserved.
+        </p>
+      </div>
+
+      {/* Right panel - form */}
+      <div className="flex-1 flex items-center justify-center px-6 py-12 bg-slate-50">
+        <div className="w-full max-w-sm space-y-8">
+          {/* Mobile logo */}
+          <div className="flex lg:hidden items-center justify-center gap-2 text-navy">
+            <div className="bg-gold p-2 rounded-xl">
+              <Store size={24} className="text-white" />
+            </div>
+            <span className="text-xl font-bold text-gold">ShopCo</span>
+          </div>
+
+          <div>
+            <h1 className="text-3xl font-bold text-slate-800">Welcome back</h1>
+            <p className="text-slate-500 mt-1">Sign in to your ShopCo account</p>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            <Input label="Email address" type="email" {...register('email')} error={errors.email?.message} placeholder="you@example.com" />
+            <Input label="Password" type="password" {...register('password')} error={errors.password?.message} placeholder="••••••••" />
+            <Button type="submit" size="lg" className="w-full" disabled={isSubmitting}>
+              {isSubmitting ? 'Signing in...' : 'Sign In'}
+            </Button>
+          </form>
+
+          <p className="text-center text-sm text-slate-500">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-amber-600 font-semibold hover:underline">
+              Create one free
+            </Link>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
