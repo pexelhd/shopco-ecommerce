@@ -1,5 +1,7 @@
 const db = require('../config/database');
 
+const parseProduct = (p) => p ? { ...p, price: parseFloat(p.price) } : p;
+
 const getProducts = async (req, res) => {
   const { search = '', category = '', minPrice, maxPrice, page = 1, limit = 12 } = req.query;
   const offset = (parseInt(page) - 1) * parseInt(limit);
@@ -46,7 +48,7 @@ const getProducts = async (req, res) => {
 
   res.json({
     success: true,
-    data: products.rows,
+    data: products.rows.map(parseProduct),
     pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / parseInt(limit)) },
   });
 };
@@ -57,7 +59,7 @@ const getFeatured = async (req, res) => {
      FROM products p LEFT JOIN categories c ON p.category_id = c.id
      WHERE p.is_active = true ORDER BY p.created_at DESC LIMIT 8`
   );
-  res.json({ success: true, data: rows });
+  res.json({ success: true, data: rows.map(parseProduct) });
 };
 
 const getCategories = async (req, res) => {
@@ -73,7 +75,7 @@ const getProduct = async (req, res) => {
     [req.params.id]
   );
   if (!rows[0]) return res.status(404).json({ success: false, message: 'Product not found' });
-  res.json({ success: true, data: rows[0] });
+  res.json({ success: true, data: parseProduct(rows[0]) });
 };
 
 const createProduct = async (req, res) => {
@@ -85,7 +87,7 @@ const createProduct = async (req, res) => {
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
     [name, slug, description || null, price, image_url || null, category_id || null, stock, is_active]
   );
-  res.status(201).json({ success: true, data: rows[0] });
+  res.status(201).json({ success: true, data: parseProduct(rows[0]) });
 };
 
 const updateProduct = async (req, res) => {
@@ -101,7 +103,7 @@ const updateProduct = async (req, res) => {
     [fields.name, slug, fields.description || null, fields.price, fields.image_url || null,
      fields.category_id || null, fields.stock, fields.is_active, req.params.id]
   );
-  res.json({ success: true, data: rows[0] });
+  res.json({ success: true, data: parseProduct(rows[0]) });
 };
 
 const deleteProduct = async (req, res) => {

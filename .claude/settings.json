@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(start \"\" \"https://shopco-ecommerce-pi.vercel.app\")"
+    ]
+  }
+}

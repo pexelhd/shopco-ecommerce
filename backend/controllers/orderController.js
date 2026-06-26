@@ -1,5 +1,8 @@
 const db = require('../config/database');
 
+const parseOrder = (o) => o ? { ...o, total_amount: parseFloat(o.total_amount) } : o;
+const parseOrderItem = (i) => i ? { ...i, unit_price: parseFloat(i.unit_price), subtotal: parseFloat(i.subtotal) } : i;
+
 const createOrder = async (req, res) => {
   const { customer_name, customer_email, customer_phone, shipping_address, notes, items } = req.body;
 
@@ -48,7 +51,7 @@ const createOrder = async (req, res) => {
 
     const { rows: [order] } = await db.query('SELECT * FROM orders WHERE id = $1', [orderId]);
     const { rows: savedItems } = await db.query('SELECT * FROM order_items WHERE order_id = $1', [orderId]);
-    res.status(201).json({ success: true, data: { ...order, items: savedItems } });
+    res.status(201).json({ success: true, data: { ...parseOrder(order), items: savedItems.map(parseOrderItem) } });
   } catch (err) {
     await client.query('ROLLBACK');
     throw err;
@@ -77,7 +80,7 @@ const getOrders = async (req, res) => {
   );
 
   res.json({
-    success: true, data: rows,
+    success: true, data: rows.map(parseOrder),
     pagination: { total, page: parseInt(page), limit: parseInt(limit), pages: Math.ceil(total / parseInt(limit)) },
   });
 };
@@ -87,7 +90,7 @@ const getOrder = async (req, res) => {
   if (!rows[0]) return res.status(404).json({ success: false, message: 'Order not found' });
 
   const { rows: items } = await db.query('SELECT * FROM order_items WHERE order_id = $1', [req.params.id]);
-  res.json({ success: true, data: { ...rows[0], items } });
+  res.json({ success: true, data: { ...parseOrder(rows[0]), items: items.map(parseOrderItem) } });
 };
 
 const updateStatus = async (req, res) => {
@@ -98,7 +101,7 @@ const updateStatus = async (req, res) => {
     'UPDATE orders SET status=$1, updated_at=NOW() WHERE id=$2 RETURNING *',
     [req.body.status, req.params.id]
   );
-  res.json({ success: true, data: rows[0] });
+  res.json({ success: true, data: parseOrder(rows[0]) });
 };
 
 module.exports = { createOrder, getOrders, getOrder, updateStatus };
