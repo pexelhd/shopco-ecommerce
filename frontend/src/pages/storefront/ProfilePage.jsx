@@ -36,11 +36,16 @@ export default function ProfilePage() {
 
   useEffect(() => {
     getProfile().then((res) => {
-      setProfile(res.data.data);
-      reset({ name: res.data.data.name, email: res.data.data.email });
+      const data = res.data.data;
+      setProfile(data);
+      reset({ name: data.name, email: data.email, currentPassword: '', newPassword: '', confirmPassword: '' });
       setLoading(false);
-    }).catch(() => setLoading(false));
-  }, [reset]);
+    }).catch(() => {
+      // Fallback to stored user data
+      if (user) reset({ name: user.name, email: user.email });
+      setLoading(false);
+    });
+  }, []); // eslint-disable-line
 
   const onSubmit = async (values) => {
     try {
@@ -74,19 +79,21 @@ export default function ProfilePage() {
       <Navbar />
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-10">
         {/* Profile header */}
-        <div className="bg-navy rounded-2xl p-8 flex items-center gap-6 mb-8">
-          <div className="w-20 h-20 rounded-full bg-gold flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
-            {initials}
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-white">{profile?.name}</h1>
-            <p className="text-slate-400">{profile?.email}</p>
-            {profile?.created_at && (
-              <p className="text-slate-500 text-sm mt-1 flex items-center gap-1">
-                <Calendar size={13} />
-                Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-              </p>
-            )}
+        <div className="bg-navy rounded-2xl p-6 mb-8">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 text-center sm:text-left">
+            <div className="w-20 h-20 rounded-full bg-gold flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
+              {initials}
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold text-white break-words">{profile?.name || user?.name}</h1>
+              <p className="text-slate-400 break-all">{profile?.email || user?.email}</p>
+              {profile?.created_at && (
+                <p className="text-slate-500 text-sm mt-1 flex items-center justify-center sm:justify-start gap-1">
+                  <Calendar size={13} />
+                  Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
